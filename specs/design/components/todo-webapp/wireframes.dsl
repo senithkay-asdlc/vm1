@@ -1,5 +1,5 @@
 screen TodoList "The signed-in user's todo list — add a todo and mark one done"
-  navbar "Todo" "Sign out"
+  navbar "Todo"
   heading "My Todos"
   row
     input "What needs doing?"
