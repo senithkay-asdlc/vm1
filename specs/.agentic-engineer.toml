@@ -1,0 +1,4 @@
+apiVersion = "agentic-engineer/v1"
+name = "vm1"
+createdAt = "2026-09-30T19:38:36Z"
+idea = "create a very minimal todo app with just todo add and todo mark as done. no update no delete nothing. user should be logged in and the data should be saved on a database"
