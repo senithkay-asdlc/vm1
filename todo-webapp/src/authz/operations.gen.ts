@@ -20,11 +20,13 @@ export type OperationRequirement =
 /** "<METHOD> <path template>" as the contract spells it, e.g. "GET /me/claims". Sorted. */
 export type OperationKey =
   | "GET /me/todos"
+  | "PATCH /me/todos/{todoId}"
   | "POST /me/todos"
   | "POST /me/todos/{todoId}/complete";
 
 export const OPERATIONS: Record<OperationKey, OperationRequirement> = {
   "GET /me/todos": { kind: "scope", scope: "todos:read" },
+  "PATCH /me/todos/{todoId}": { kind: "scope", scope: "todos:edit" },
   "POST /me/todos": { kind: "scope", scope: "todos:create" },
   "POST /me/todos/{todoId}/complete": { kind: "scope", scope: "todos:complete" },
 };

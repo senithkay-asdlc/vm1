@@ -6,20 +6,21 @@
 export type Scope =
   | "todos:complete"
   | "todos:create"
+  | "todos:edit"
   | "todos:read";
 
 export type Role =
   | "User";
 
 /** Every handle the catalog declares, sorted. */
-export const SCOPES: readonly Scope[] = ["todos:complete", "todos:create", "todos:read"];
+export const SCOPES: readonly Scope[] = ["todos:complete", "todos:create", "todos:edit", "todos:read"];
 
 /** Every role a person can hold, sorted. Service-kind roles are not here. */
 export const ROLES: readonly Role[] = ["User"];
 
 /** What each role grants. heldRoles() projects the caller's scopes through this. */
 export const ROLE_GRANTS: Record<Role, readonly Scope[]> = {
-  "User": ["todos:complete", "todos:create", "todos:read"],
+  "User": ["todos:complete", "todos:create", "todos:edit", "todos:read"],
 };
 
 /** The directory groups a role is assigned to — what NoAccess tells a user to ask for. */

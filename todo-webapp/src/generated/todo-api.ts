@@ -22,6 +22,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/todos/{todoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit the text of one of the caller's pending todos */
+        patch: operations["editMyTodo"];
+        trace?: never;
+    };
     "/me/todos/{todoId}/complete": {
         parameters: {
             query?: never;
@@ -58,6 +75,10 @@ export interface components {
         };
         NewTodo: {
             /** @description what needs doing */
+            text: string;
+        };
+        TodoEdit: {
+            /** @description the corrected text */
             text: string;
         };
         Error: {
@@ -152,6 +173,59 @@ export interface operations {
             };
             /** @description not signed in */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    editMyTodo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                todoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TodoEdit"];
+            };
+        };
+        responses: {
+            /** @description todo text updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Todo"];
+                };
+            };
+            /** @description invalid text */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description no such pending todo for the caller */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -2,8 +2,9 @@
 // structure below is prescribed — see that file's comment for why:
 // NoAccess sits ABOVE the shell and replaces it; Forbidden sits INSIDE the
 // shell; /forbidden is wired into authz/client once, from the router;
-// /callback is routed outside the provider. todo-webapp has one screen and
-// no `public` screens — sign-in is entirely Thunder SSO, never drawn here.
+// /callback is routed outside the provider. todo-webapp has two screens
+// (TodoList, EditTodo) and no `public` screens — sign-in is entirely Thunder
+// SSO, never drawn here.
 
 import { useEffect, type ReactElement } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
@@ -21,11 +22,13 @@ import { signIn } from "./authz/session";
 import { AppShellLayout } from "./shell/AppShell";
 import { CallbackPage } from "./pages/Callback";
 import { TodoListPage } from "./pages/TodoList";
+import { EditTodoPage } from "./pages/EditTodo";
 import { APP_NAME } from "./appName";
 
 /** YOUR pages, keyed by the screen keys src/authz/screens.ts declares. */
 const PAGE_BY_KEY: Record<string, ReactElement> = {
   todolist: <TodoListPage />,
+  edittodo: <EditTodoPage />,
 };
 
 export function App(): ReactElement {
