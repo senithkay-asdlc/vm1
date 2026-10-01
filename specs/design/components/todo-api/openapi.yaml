@@ -17,6 +17,7 @@ components:
             todos:read: The caller's own todos
             todos:create: Add a new todo to the caller's list
             todos:complete: Mark one of the caller's todos as done
+            todos:edit: Edit the text of one of the caller's pending todos
   schemas:
     Todo:
       type: object
@@ -31,6 +32,11 @@ components:
       required: [text]
       properties:
         text: { type: string, description: what needs doing }
+    TodoEdit:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, description: the corrected text }
     Error:
       type: object
       required: [code, message]
@@ -93,6 +99,43 @@ paths:
               schema: { $ref: '#/components/schemas/Todo' }
         '400':
           description: invalid todo
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: not signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /me/todos/{todoId}:
+    patch:
+      operationId: editMyTodo
+      summary: Edit the text of one of the caller's pending todos
+      security:
+        - oauth2: [todos:edit]
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TodoEdit' }
+      responses:
+        '200':
+          description: todo text updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Todo' }
+        '400':
+          description: invalid text
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: no such pending todo for the caller
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }

@@ -19,5 +19,6 @@ erDiagram
 ```
 
 - `USER` is not stored by this app — it is the signed-in identity Thunder asserts on every request. `userId` on `TODO` is that identity's id.
-- `TODO.done` starts `false` and can only ever move to `true` — there is no path back to `false` and no edit of `text` once created, per the PRD's explicit no-edit/no-delete rule.
+- `TODO.done` starts `false` and can only ever move to `true` — there is no path back to `false`, and there is still no delete.
+- `TODO.text` can be changed while `done` is `false`; once `done` becomes `true`, `text` is locked and cannot be edited.
 

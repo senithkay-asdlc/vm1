@@ -39,6 +39,22 @@ Feature: Managing a private todo list
       When Sam views his list of todos
       Then Sam sees "File taxes" and does not see "Buy milk"
 
+  @story-6
+  Rule: A pending todo's text can be edited
+
+    Scenario: Fixing a mistake before finishing
+      Given Maya has added a todo named "By milk" that is still pending
+      When Maya edits it to "Buy milk"
+      Then Maya's list shows "Buy milk" instead of "By milk"
+
+  @story-6 @negative
+  Rule: A todo's text cannot be edited once it is marked done
+
+    Scenario: A done todo stays as it was
+      Given Maya has added a todo named "Buy milk" that she has marked done
+      When Maya tries to edit it to "Buy milk and eggs"
+      Then Maya's list still shows it as "Buy milk"
+
   @story-5
   Rule: A signed-in user can mark one of their own todos as done
 

@@ -28,6 +28,7 @@ is no shared or team list and no admin role.
 3. As a User, I want to add a todo, so that I can capture something I need to do.
 4. As a User, I want to view my list of todos, so that I can see what's still pending and what I've finished.
 5. As a User, I want to mark a todo as done, so that I can track my progress without deleting my history of tasks.
+6. As a User, I want to edit a todo's text while it's still pending, so that I can fix a mistake before I finish it.
 
 ## Product Decisions
 
@@ -35,11 +36,11 @@ is no shared or team list and no admin role.
 - Self-service sign-up is permitted — anyone can create their own account and start using the app right away.
 - Todos are private per user: nobody sees or acts on another user's list.
 - Todo data is persisted in a database so it survives across sessions.
-- The only actions on a todo are creating it and marking it done — there is no edit and no delete, by explicit product choice.
+- A pending todo's text can be edited; once a todo is marked done its text is locked and cannot be changed. There is still no delete, by explicit product choice.
 
 ## Out of Scope
 
-- Editing a todo's text once created.
+- Editing a todo's text after it has been marked done.
 - Deleting a todo.
 - Un-marking a todo (reverting it from done back to pending).
 - Due dates, priorities, categories, tags, or reminders.

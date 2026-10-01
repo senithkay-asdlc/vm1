@@ -12,9 +12,10 @@
     2,
     3,
     4,
-    5
+    5,
+    6
   ],
-  "description": "The single-page app a user signs into to manage their own todo list: one screen to add a todo and mark one done. Carries no business logic and no data of its own — everything is read from and written to todo-api. Does not support editing or deleting a todo.",
+  "description": "The single-page app a user signs into to manage their own todo list: add a todo, edit a pending one's text, and mark one done. Carries no business logic and no data of its own — everything is read from and written to todo-api. Does not support editing a todo once it is marked done, and does not support deleting a todo.",
   "dependencies": [
     {
       "kind": "component",

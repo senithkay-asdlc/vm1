@@ -10,9 +10,10 @@
   "stories": [
     3,
     4,
-    5
+    5,
+    6
   ],
-  "description": "Owns the Todo entity: lets the signed-in caller list their own todos, add a new one, and mark one as done. Persists todos in its dedicated Postgres database, scoped per caller by the gateway-asserted identity. Does not support editing or deleting a todo, and never exposes another user's todos.",
+  "description": "Owns the Todo entity: lets the signed-in caller list their own todos, add a new one, edit a pending one's text, and mark one as done. Persists todos in its dedicated Postgres database, scoped per caller by the gateway-asserted identity. Locks a todo's text once it is marked done, does not support deleting a todo, and never exposes another user's todos.",
   "dependencies": [
     {
       "kind": "platform-resource",
