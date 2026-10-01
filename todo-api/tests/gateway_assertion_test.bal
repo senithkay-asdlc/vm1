@@ -3,11 +3,16 @@
 // one signed with the wrong key is 401, and one whose payload was edited
 // after signing is 401 — never downgraded to an anonymous caller.
 //
-// GATEWAY_ASSERTION_CERTIFICATE / _ISSUER / _HEADER must be exported to a
-// throwaway RSA keypair's self-signed certificate BEFORE `bal test` runs
-// (see tests/resources and the export block the run script sets up) — with
-// the trio unset the interceptor takes its unverified fallback and every
-// case here fails for a reason the output does not name.
+// GATEWAY_ASSERTION_CERTIFICATE / _ISSUER / _HEADER are set from this
+// throwaway RSA keypair by the module-level initializer below, so `bal test`
+// is self-contained and needs no shell export step from whatever runs it —
+// a CI build step included. That initializer runs during Ballerina's
+// module-init phase, which completes for every file in the package BEFORE
+// the listener starts and attaches the interceptor; a `@test:BeforeSuite`
+// hook runs too late for this (measured: the listener is already up, so the
+// interceptor has already read an empty trio and latched its unverified
+// fallback). With the trio unset, every case here fails for a reason the
+// output does not name.
 //
 // todo-api has no `security: []` operation, so every one of its three
 // resources needs the assertion — there is no public-path case to add here.
@@ -19,8 +24,10 @@
 
 import ballerina/crypto;
 import ballerina/http;
+import ballerina/io;
 import ballerina/jwt;
 import ballerina/lang.array;
+import ballerina/os;
 import ballerina/test;
 
 const string TEST_ISSUER = "test-gateway-issuer";
@@ -28,6 +35,26 @@ const string ASSERTION_HEADER = "x-jwt-assertion";
 
 const string VALID_KEY_FILE = "tests/resources/valid_key.pem";
 const string WRONG_KEY_FILE = "tests/resources/wrong_key.pem";
+const string VALID_CERT_FILE = "tests/resources/valid_cert.pem";
+
+// Runs as a module-level variable initializer — before the listener starts
+// — so the interceptor's own init() reads a populated trio rather than an
+// empty one.
+function setGatewayAssertionTestEnv() returns boolean {
+    string|error cert = io:fileReadString(VALID_CERT_FILE);
+    if cert is error {
+        panic error("could not read " + VALID_CERT_FILE, cert);
+    }
+    error? e1 = os:setEnv("GATEWAY_ASSERTION_CERTIFICATE", cert);
+    error? e2 = os:setEnv("GATEWAY_ASSERTION_ISSUER", TEST_ISSUER);
+    error? e3 = os:setEnv("GATEWAY_ASSERTION_HEADER", ASSERTION_HEADER);
+    if e1 is error || e2 is error || e3 is error {
+        panic error("could not set GATEWAY_ASSERTION_* test env vars");
+    }
+    return true;
+}
+
+final boolean gatewayAssertionTestEnvReady = setGatewayAssertionTestEnv();
 
 final http:Client gatewayTestClient = check new ("http://localhost:9090");
 
