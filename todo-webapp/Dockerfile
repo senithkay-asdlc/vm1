@@ -12,3 +12,4 @@ COPY nginx/15-aep-api-proxy.sh /docker-entrypoint.d/15-aep-api-proxy.sh
 RUN chmod +x /docker-entrypoint.d/15-aep-api-proxy.sh
 EXPOSE 9090
 CMD ["nginx", "-g", "daemon off;"]
+
