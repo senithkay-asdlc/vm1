@@ -84,6 +84,29 @@ export const handlers = [
     return HttpResponse.json(asTodo(created), { status: 201 });
   }),
 
+  http.patch("/api/me/todos/:todoId", async ({ params, request }) => {
+    const todoId = params.todoId as string;
+    const input = (await request.json()) as { text?: string };
+    if (!input?.text || input.text.trim().length === 0) {
+      return HttpResponse.json(
+        { code: 400, message: "text is required" },
+        { status: 400 },
+      );
+    }
+    const index = todos.findIndex((t) => t.id === todoId && t.owner === mockCaller.userId);
+    // A row that exists but is not the caller's is a 404, not a 403 — under
+    // /me/ it is simply not in the caller's collection. Already-done is the
+    // same answer: the contract only edits a PENDING todo.
+    if (index === -1 || todos[index].done) {
+      return HttpResponse.json(
+        { code: 404, message: "no such pending todo for the caller" },
+        { status: 404 },
+      );
+    }
+    todos[index] = { ...todos[index], text: input.text };
+    return HttpResponse.json(asTodo(todos[index]));
+  }),
+
   http.post("/api/me/todos/:todoId/complete", ({ params }) => {
     const todoId = params.todoId as string;
     const index = todos.findIndex((t) => t.id === todoId && t.owner === mockCaller.userId);

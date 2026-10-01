@@ -86,6 +86,36 @@ service http:InterceptableService / on ep0 {
         return <Todo>{id: id, text: text, done: false, createdAt: time:utcToString(createdAt)};
     }
 
+    # Edit the text of one of the caller's pending todos
+    #
+    # + return - returns can be any of following types
+    # http:Ok (todo text updated)
+    # http:BadRequest (invalid text)
+    # http:NotFound (no such pending todo for the caller)
+    # http:Unauthorized (not signed in)
+    resource function patch me/todos/[string todoId](http:RequestContext ctx, @http:Payload TodoEdit payload)
+            returns TodoOk|ErrorBadRequest|ErrorNotFound|ErrorUnauthorized|http:InternalServerError {
+        GatewayCaller|http:Unauthorized caller = requireGatewayCaller(ctx);
+        if caller is http:Unauthorized {
+            return <ErrorUnauthorized>{body: {code: 401, message: "not signed in"}};
+        }
+
+        string text = payload.text.trim();
+        if text == "" {
+            return <ErrorBadRequest>{body: {code: 400, message: "text must not be empty"}};
+        }
+
+        TodoRow|error result = editTodoForUser(todoId, caller.userId, text);
+        if result is sql:NoRowsError {
+            return <ErrorNotFound>{body: {code: 404, message: "no such pending todo for the caller"}};
+        }
+        if result is error {
+            return <http:InternalServerError>{body: {code: 500, message: "failed to edit todo"}};
+        }
+
+        return <TodoOk>{body: toTodo(result)};
+    }
+
     # Mark one of the caller's todos as done
     #
     # + return - returns can be any of following types
@@ -136,6 +166,11 @@ public type Todo record {
 
 public type NewTodo record {
     # what needs doing
+    string text;
+};
+
+public type TodoEdit record {
+    # the corrected text
     string text;
 };
 

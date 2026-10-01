@@ -1,10 +1,13 @@
 // The TodoList screen (specs/design/components/todo-webapp/wireframes.dsl):
 // navbar "Todo" (shell), heading "My Todos", a row of input + "Add" button,
-// and a table "Todo | Status" with a way to mark a pending todo done.
+// and a table "Todo | Status | Action" with a way to mark a pending todo
+// done, or edit its text (-> EditTodo).
 //
 // Loads GET /me/todos (gated by src/authz/screens.ts); adds via POST
-// /me/todos; completes via POST /me/todos/{todoId}/complete. No local
-// business logic — every read and write goes through todoApi.
+// /me/todos; completes via POST /me/todos/{todoId}/complete. The Action
+// column's Edit button only navigates to /todos/:todoId/edit — the actual
+// PATCH /me/todos/{todoId} happens on that screen. No local business logic —
+// every read and write goes through todoApi.
 
 import {
   Alert,
@@ -19,6 +22,7 @@ import {
 } from "@wso2/oxygen-ui";
 import { Plus } from "@wso2/oxygen-ui-icons-react";
 import { useEffect, useState, type JSX } from "react";
+import { useNavigate } from "react-router-dom";
 import { todoApi } from "../api";
 import type { components } from "../generated/todo-api";
 import { Can } from "../authz/gates";
@@ -26,6 +30,7 @@ import { Can } from "../authz/gates";
 type Todo = components["schemas"]["Todo"];
 
 export function TodoListPage(): JSX.Element {
+  const navigate = useNavigate();
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newTodoText, setNewTodoText] = useState("");
@@ -129,12 +134,13 @@ export function TodoListPage(): JSX.Element {
               <ListingTable.Row>
                 <ListingTable.Cell>Todo</ListingTable.Cell>
                 <ListingTable.Cell>Status</ListingTable.Cell>
+                <ListingTable.Cell>Action</ListingTable.Cell>
               </ListingTable.Row>
             </ListingTable.Head>
             <ListingTable.Body>
               {todos.length === 0 ? (
                 <ListingTable.Row>
-                  <ListingTable.Cell colSpan={2}>
+                  <ListingTable.Cell colSpan={3}>
                     <ListingTable.EmptyState
                       title="No todos yet"
                       description="Add your first todo above."
@@ -165,6 +171,25 @@ export function TodoListPage(): JSX.Element {
                           </Can>
                         ) : null}
                       </Stack>
+                    </ListingTable.Cell>
+                    <ListingTable.Cell>
+                      {!todo.done ? (
+                        <Can op="PATCH /me/todos/{todoId}">
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() =>
+                              navigate(`/todos/${todo.id}/edit`, {
+                                state: { text: todo.text },
+                              })
+                            }
+                          >
+                            Edit
+                          </Button>
+                        </Can>
+                      ) : (
+                        "—"
+                      )}
                     </ListingTable.Cell>
                   </ListingTable.Row>
                 ))

@@ -7,5 +7,5 @@
 // report, never a mock to loosen.
 
 export const mockRoles: readonly { readonly name: string; readonly grants: readonly string[] }[] = [
-  { name: "User", grants: ["todos:complete", "todos:create", "todos:read"] },
+  { name: "User", grants: ["todos:complete", "todos:create", "todos:edit", "todos:read"] },
 ];

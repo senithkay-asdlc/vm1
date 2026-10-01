@@ -20,9 +20,11 @@
 // file that knows about screens: each row names the operation its screen
 // LOADS, and the gate follows from that — never a handle typed into JSX.
 //
-// todo-webapp has exactly one screen (TodoList, per wireframes.dsl) and one
-// role (User, per security.json). It loads "GET /me/todos" — the caller's
-// own todos. Sign-up and sign-in are Thunder SSO; there is no public screen.
+// todo-webapp has two screens (TodoList and EditTodo, per wireframes.dsl) and
+// one role (User, per security.json). TodoList loads "GET /me/todos" — the
+// caller's own todos. EditTodo is a form with no load call, so it names the
+// operation its submit makes: "PATCH /me/todos/{todoId}". Sign-up and sign-in
+// are Thunder SSO; there is no public screen.
 
 import { canCall } from "./core";
 import { OPERATIONS, isOperationKey, type OperationKey } from "./operations.gen";
@@ -41,6 +43,12 @@ export interface ScreenRoute {
 
 export const SCREEN_ROUTES: readonly ScreenRoute[] = [
   { key: "todolist", label: "My Todos", path: "/todos", loads: "GET /me/todos" },
+  {
+    key: "edittodo",
+    label: "Edit Todo",
+    path: "/todos/:todoId/edit",
+    loads: "PATCH /me/todos/{todoId}",
+  },
 ];
 
 // FAIL LOUDLY, at module load, on a stale table.

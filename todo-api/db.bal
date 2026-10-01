@@ -120,3 +120,22 @@ function completeTodoForUser(string todoId, string userId) returns TodoRow|error
     TodoRow row = check dbc->queryRow(q);
     return row;
 }
+
+// Updates todoId's text, only when it belongs to userId and is still
+// pending. The done = FALSE guard locks a todo's text once it is marked
+// done, same as the entity description promises. sql:NoRowsError when no
+// row matches id + owner + pending, so the caller returns 404 without it
+// ever having been possible to learn whether the id belongs to someone
+// else or is already done.
+function editTodoForUser(string todoId, string userId, string text) returns TodoRow|error {
+    postgresql:Client|error dbc = readyClient();
+    if dbc is error {
+        return dbc;
+    }
+    sql:ParameterizedQuery q = `UPDATE todos
+        SET text = ${text}
+        WHERE id = ${todoId} AND user_id = ${userId} AND done = FALSE
+        RETURNING id, text, done, created_at AS "createdAt"`;
+    TodoRow row = check dbc->queryRow(q);
+    return row;
+}
